@@ -2,7 +2,7 @@
 #ifndef MARKDOWN_PEG_H
 #define MARKDOWN_PEG_H
 
-#include "markdown_lib.h"
+#include "markdownparse.h"
 #include <glib.h>
 
 /* Information (label, URL and title) for a link. */

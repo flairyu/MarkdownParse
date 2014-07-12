@@ -1,5 +1,5 @@
-#ifndef MARKDOWN_LIB_H
-#define MARKDOWN_LIB_H
+#ifndef MARKDOWNPARSE_H
+#define MARKDOWNPARSE_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -33,4 +33,3 @@ char * markdown_to_string(char *text, int extensions, int output_format);
 
 /* vim: set ts=4 sw=4 : */
 #endif
-
