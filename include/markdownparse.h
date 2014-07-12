@@ -21,7 +21,8 @@ union Contents {
 };
 
 /* Types of semantic values returned by parsers. */ 
-enum keys { LIST,   /* A generic list of values.  For ordered and bullet lists, see below. */
+enum keys { DOCUMENT,
+            LIST,   /* A generic list of values.  For ordered and bullet lists, see below. */
             RAW,    /* Raw markdown to be processed further */
             SPACE,
             LINEBREAK,

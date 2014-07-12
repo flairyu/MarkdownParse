@@ -4,6 +4,7 @@
 
 #include "markdownparse.h"
 #include "parse.h"
+#include "utility.h"
 
 #define TABSTOP 4
 
@@ -72,18 +73,24 @@ static element * process_raw_blocks(element *input, int extensions, element *ref
 }
 
 element *parse_markdown(const char *markdown, int extensions) {
-    element *result;
+    element *content;
     element *references;
     element *notes;
+    element *document;
     GString *formatted_text;
 
     formatted_text = preformat_text(markdown);
 
     references = parse_references(formatted_text->str, extensions);
     notes = parse_notes(formatted_text->str, extensions, references);
-    result = parse_content(formatted_text->str, extensions, references, notes);
+    content = parse_content(formatted_text->str, extensions, references, notes);
 
-    return process_raw_blocks(result, extensions, references, notes);
+    content = process_raw_blocks(content, extensions, references, notes);
+
+    document = mk_element(DOCUMENT);
+    document->children = content;
+
+    return document;
 }
 
 void free_element_tree(element * elt) {
