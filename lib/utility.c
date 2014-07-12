@@ -1,11 +1,12 @@
 /* utility_functions.c - List manipulation functions, element
  * constructors, and macro definitions for leg markdown parser. */
 
-#include "utility_functions.h"
-#include "markdown_peg.h"
+#include "utility.h"
 
 #include <string.h>
 #include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 
 /**********************************************************************

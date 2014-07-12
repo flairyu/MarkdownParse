@@ -17,8 +17,8 @@
 
 #include <stdbool.h>
 #include <assert.h>
-#include "markdown_peg.h"
-#include "utility_functions.h"
+#include "parse.h"
+#include "utility.h"
 
 
 

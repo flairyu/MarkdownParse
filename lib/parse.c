@@ -12,26 +12,10 @@ extern int yy_References();
 extern int yy_Notes();
 extern int yy_Doc();
 
-#include "utility_functions.h"
-#include "parsing_functions.h"
-#include "markdown_peg.h"
+#include "utility.h"
+#include "parse.h"
 
 static void free_element_contents(element elt);
-
-/* free_element_list - free list of elements recursively */
-void free_element_list(element * elt) {
-    element * next = NULL;
-    while (elt != NULL) {
-        next = elt->next;
-        free_element_contents(*elt);
-        if (elt->children != NULL) {
-            free_element_list(elt->children);
-            elt->children = NULL;
-        }
-        free(elt);
-        elt = next;
-    }
-}
 
 /* free_element_contents - free element contents depending on type */
 static void free_element_contents(element elt) {
@@ -99,7 +83,7 @@ element * parse_notes(char *string, int extensions, element *reference_list) {
     return notes;
 }
 
-element * parse_markdown(char *string, int extensions, element *reference_list, element *note_list) {
+element * parse_content(char *string, int extensions, element *reference_list, element *note_list) {
 
     char *oldcharbuf;
     syntax_extensions = extensions;

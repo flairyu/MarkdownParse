@@ -3,8 +3,7 @@
 
 #include <stdbool.h>
 #include <glib.h>
-
-#include "markdown_peg.h"
+#include "markdownparse.h"
 
 /* utility_functions.h - List manipulation functions, element
  * constructors, and macro definitions for leg markdown parser. */
