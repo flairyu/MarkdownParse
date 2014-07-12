@@ -1,11 +1,15 @@
+#include <stdlib.h>
+#include <string.h>
 #include <glib.h>
+
 #include "markdownparse.h"
+#include "parse.h"
 
 #define TABSTOP 4
 
 /* preformat_text - allocate and copy text buffer while
  * performing tab expansion. */
-static GString *preformat_text(char *text) {
+static GString *preformat_text(const char *text) {
     GString *buf;
     char next_char;
     int charstotab;

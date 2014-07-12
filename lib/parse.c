@@ -1,6 +1,8 @@
 /* parsing_functions.c - Functions for parsing markdown and
  * freeing element lists. */
 
+#include <stdlib.h>
+
 /* These yy_* functions come from markdown_parser.c which is
  * generated from markdown_parser.leg
  * */
@@ -15,10 +17,8 @@ extern int yy_Doc();
 #include "utility.h"
 #include "parse.h"
 
-static void free_element_contents(element elt);
-
 /* free_element_contents - free element contents depending on type */
-static void free_element_contents(element elt) {
+void free_element_contents(element elt) {
     switch (elt.key) {
       case STR:
       case SPACE:
@@ -38,7 +38,7 @@ static void free_element_contents(element elt) {
         elt.contents.link->url = NULL;
         free(elt.contents.link->title);
         elt.contents.link->title = NULL;
-        free_element_list(elt.contents.link->label);
+        free_element_tree(elt.contents.link->label);
         free(elt.contents.link);
         elt.contents.link = NULL;
         break;

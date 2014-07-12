@@ -537,7 +537,7 @@ ReferenceLinkDouble =  a:Label < Spnl > !"[]" b:Label
                            if (find_reference(&match, b->children)) {
                                $$ = mk_link(a->children, match.url, match.title);
                                free(a);
-                               free_element_list(b);
+                               free_element_tree(b);
                            } else {
                                element *result;
                                result = mk_element(LIST);
