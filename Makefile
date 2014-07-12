@@ -34,10 +34,6 @@ clean:
 
 distclean: clean
 	make -C $(PEGDIR) clean
-\
-test: $(PROGRAM)
-	cd MarkdownTest_1.0.3; \
-	./MarkdownTest.pl --script=../$(PROGRAM) --tidy
 
 leak-check: $(PROGRAM)
 	valgrind --leak-check=full ./markdown README
