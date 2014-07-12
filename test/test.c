@@ -2,12 +2,26 @@
 
 #include "markdownparse.h"
 
+void print_strings(element* parent) {
+	element *child;
+
+	if (parent->key == STR) {
+		printf("%s\n", parent->contents.str);
+	} else {
+		child = parent->children;
+		while (child) {
+			print_strings(child);
+			child = child->next;
+		}
+	}
+}
+
 int main()
 {
-	element *paragraph = parse_markdown("Hello foo *this* is", 0);
-	element *child = root->children;
-	do {
-		printf("%d\n", child->key);
-	} while (child = child->next);
+	element *document = parse_markdown("Hello\n=====\n\nHello foo *this* is", 0);
+
+	print_strings(document);
+
+	free_element_tree(document);
 	return 0;
 }
