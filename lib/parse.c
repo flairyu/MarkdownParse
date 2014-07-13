@@ -3,6 +3,9 @@
 
 #include <stdlib.h>
 
+#include "utility.h"
+#include "parse.h"
+
 /* These yy_* functions come from markdown_parser.c which is
  * generated from markdown_parser.leg
  * */
@@ -14,88 +17,78 @@ extern int yy_References();
 extern int yy_Notes();
 extern int yy_Doc();
 
-#include "utility.h"
-#include "parse.h"
-
 /* free_element_contents - free element contents depending on type */
-void free_element_contents(element elt) {
-    switch (elt.key) {
-      case STR:
-      case SPACE:
-      case RAW:
-      case HTMLBLOCK:
-      case HTML:
-      case VERBATIM:
-      case CODE:
-      case NOTE:
-        free(elt.contents.str);
-        elt.contents.str = NULL;
-        break;
-      case LINK:
-      case IMAGE:
-      case REFERENCE:
-        free(elt.contents.link->url);
-        elt.contents.link->url = NULL;
-        free(elt.contents.link->title);
-        elt.contents.link->title = NULL;
-        free_element_tree(elt.contents.link->label);
-        free(elt.contents.link);
-        elt.contents.link = NULL;
-        break;
-      default:
-        ;
-    }
+void free_element_contents(element element) {
+	switch (element.key) {
+		case STR:
+		case SPACE:
+		case RAW:
+		case HTMLBLOCK:
+		case HTML:
+		case VERBATIM:
+		case CODE:
+		case NOTE:
+			free(element.contents.str);
+			element.contents.str = NULL;
+			break;
+		case LINK:
+		case IMAGE:
+		case REFERENCE:
+			free(element.contents.link->url);
+			element.contents.link->url = NULL;
+			free(element.contents.link->title);
+			element.contents.link->title = NULL;
+			free_element_tree(element.contents.link->label);
+			free(element.contents.link);
+			element.contents.link = NULL;
+			break;
+	}
 }
 
 /* free_element - free element and contents */
-void free_element(element *elt) {
-    free_element_contents(*elt);
-    free(elt);
+void free_element(element *element) {
+	free_element_contents(*element);
+	free(element);
 }
 
-element * parse_references(char *string, int extensions) {
+element *parse_references(char *string, int extensions) {
+	syntax_extensions = extensions;
 
-    char *oldcharbuf;
-    syntax_extensions = extensions;
+	char *oldcharbuf = charbuf;
+	charbuf = string;
+	// First pass to collect references
+	yyparsefrom(yy_References);
+	charbuf = oldcharbuf;
 
-    oldcharbuf = charbuf;
-    charbuf = string;
-    yyparsefrom(yy_References);    /* first pass, just to collect references */
-    charbuf = oldcharbuf;
-
-    return references;
+	return references;
 }
 
-element * parse_notes(char *string, int extensions, element *reference_list) {
+element *parse_notes(char *string, int extensions, element *reference_list) {
+	notes = NULL;
+	syntax_extensions = extensions;
 
-    char *oldcharbuf;
-    notes = NULL;
-    syntax_extensions = extensions;
+	if (extension(EXT_NOTES)) {
+		char *oldcharbuf = charbuf;
+		references = reference_list;
+		charbuf = string;
+		// Second pass to collect notes
+		yyparsefrom(yy_Notes);
+		charbuf = oldcharbuf;
+	}
 
-    if (extension(EXT_NOTES)) {
-        references = reference_list;
-        oldcharbuf = charbuf;
-        charbuf = string;
-        yyparsefrom(yy_Notes);     /* second pass for notes */
-        charbuf = oldcharbuf;
-    }
-
-    return notes;
+	return notes;
 }
 
-element * parse_content(char *string, int extensions, element *reference_list, element *note_list) {
+element *parse_content(char *string, int extensions, element *reference_list, element *note_list) {
+	syntax_extensions = extensions;
+	references = reference_list;
+	notes = note_list;
 
-    char *oldcharbuf;
-    syntax_extensions = extensions;
-    references = reference_list;
-    notes = note_list;
+	char *oldcharbuf = charbuf;
+	charbuf = string;
 
-    oldcharbuf = charbuf;
-    charbuf = string;
+	yyparsefrom(yy_Doc);
 
-    yyparsefrom(yy_Doc);
-
-    charbuf = oldcharbuf;          /* restore charbuf to original value */
-    return parse_result;
-
+	charbuf = oldcharbuf;          /* restore charbuf to original value */
+	return parse_result;
 }

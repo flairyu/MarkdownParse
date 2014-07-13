@@ -5,9 +5,9 @@
 
 #include "markdownparse.h"
 
-element * parse_references(char *string, int extensions);
-element * parse_notes(char *string, int extensions, element *reference_list);
-element * parse_content(char *string, int extensions, element *reference_list, element *note_list);
+element *parse_references(char *string, int extensions);
+element *parse_notes(char *string, int extensions, element *reference_list);
+element *parse_content(char *string, int extensions, element *reference_list, element *note_list);
 
 void free_element(element *elt);
 void free_element_contents(element elt);

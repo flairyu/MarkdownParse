@@ -5,7 +5,7 @@
 #include <assert.h>
 
 static inline size_t nearest_power(size_t num) {
-	const size_t MAX_SIZE = -1;
+	size_t const MAX_SIZE = -1;
 
 	if (num > MAX_SIZE / 2) {
 		return MAX_SIZE;
@@ -26,11 +26,8 @@ static void str_expand(string *str, size_t length) {
 	}
 }
 
-string *str_create(const char *init) {
-	string *result;
-	size_t length;
-
-	result = malloc(sizeof(string));
+string *str_create(char const *init) {
+	string *result = malloc(sizeof(string));
 	result->length = 0;
 	result->allocated_length = 0;
 
@@ -38,7 +35,7 @@ string *str_create(const char *init) {
 		init = "";
 	}
 
-	length = strlen(init);
+	size_t length = strlen(init);
 
 	str_expand(result, length + 2);
 	strcpy(result->content, init);
@@ -53,15 +50,13 @@ void str_free(string *str) {
 }
 
 char *str_free_container(string *str) {
-	char *content;
-
-	content = str->content;
+	char *content = str->content;
 	free(str);
 
 	return content;
 }
 
-string *str_append(string *str, const char *annex) {
+string *str_append(string *str, char const *annex) {
 	assert(str != NULL);
 	assert(annex != NULL);
 
