@@ -2,25 +2,15 @@
 
 #include "markdownparse.h"
 
-void print_strings(element* parent) {
-	element *child;
-
-	if (parent->key == STR) {
-		printf("%s\n", parent->contents.str);
-	} else {
-		child = parent->children;
-		while (child) {
-			print_strings(child);
-			child = child->next;
-		}
-	}
+bool print_element(element *el, int depth) {
+	printf("Depth %d: %d\n", depth, el->key);
 }
 
 int main()
 {
-	element *document = parse_markdown("Hello\n=====\n\nHello foo *this* is", 0);
+	element *document = parse_markdown("Hello\n=====\n\nHello foo *this* is");
 
-	print_strings(document);
+	traverse_tree(document, print_element);
 
 	free_element_tree(document);
 	return 0;

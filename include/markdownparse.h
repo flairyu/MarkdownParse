@@ -1,6 +1,8 @@
 #ifndef MARKDOWNPARSE_H
 #define MARKDOWNPARSE_H
 
+#include <stdbool.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -74,6 +76,7 @@ enum markdown_extensions {
 
 element *parse_markdown(const char *string);
 element *parse_extended_markdown(const char *string, int extensions);
+void traverse_tree(element *tree, bool (*)(element *, int));
 void free_element_tree(element *elt);
 
 #ifdef __cplusplus

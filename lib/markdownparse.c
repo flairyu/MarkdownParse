@@ -94,7 +94,23 @@ element *parse_extended_markdown(const char *markdown, int extensions) {
 }
 
 element *parse_markdown(const char *markdown) {
-	return parse_extended_markdown(markdown, 0);
+    return parse_extended_markdown(markdown, 0);
+}
+
+static void traverse_tree_depth(element *tree, bool (*func)(element *, int), int depth) {
+    element *child;
+
+    if (func(tree, depth)) {
+        child = tree->children;
+        while (child != NULL) {
+            traverse_tree_depth(child, func, depth + 1);
+            child = child->next;
+        }
+    }
+}
+
+void traverse_tree(element *tree, bool (*func)(element *, int)) {
+    traverse_tree_depth(tree, func, 0);
 }
 
 void free_element_tree(element * elt) {
