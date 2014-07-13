@@ -7,3 +7,9 @@ add_library(markdownparse
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_SOURCE_DIR}/include)
+
+install(TARGETS markdownparse
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
+install(FILES ${CMAKE_SOURCE_DIR}/include/markdownparse.h
+        DESTINATION include)
