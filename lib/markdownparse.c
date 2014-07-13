@@ -1,41 +1,41 @@
 #include <stdlib.h>
 #include <string.h>
-#include <glib.h>
 
 #include "markdownparse.h"
 #include "parse.h"
 #include "utility.h"
+#include "str.h"
 
 #define TABSTOP 4
 
 /* preformat_text - allocate and copy text buffer while
  * performing tab expansion. */
-static GString *preformat_text(const char *text) {
-    GString *buf;
+static string *preformat_text(const char *text) {
+    string *buf;
     char next_char;
     int charstotab;
 
     int len = 0;
 
-    buf = g_string_new("");
+    buf = str_create("");
 
     charstotab = TABSTOP;
     while ((next_char = *text++) != '\0') {
         switch (next_char) {
         case '\t':
             while (charstotab > 0)
-                g_string_append_c(buf, ' '), len++, charstotab--;
+                str_append_char(buf, ' '), len++, charstotab--;
             break;
         case '\n':
-            g_string_append_c(buf, '\n'), len++, charstotab = TABSTOP;
+            str_append_char(buf, '\n'), len++, charstotab = TABSTOP;
             break;
         default:
-            g_string_append_c(buf, next_char), len++, charstotab--;
+            str_append_char(buf, next_char), len++, charstotab--;
         }
         if (charstotab == 0)
             charstotab = TABSTOP;
     }
-    g_string_append(buf, "\n\n");
+    str_append(buf, "\n\n");
     return(buf);
 }
 
@@ -77,13 +77,13 @@ element *parse_markdown(const char *markdown, int extensions) {
     element *references;
     element *notes;
     element *document;
-    GString *formatted_text;
+    string *formatted_text;
 
     formatted_text = preformat_text(markdown);
 
-    references = parse_references(formatted_text->str, extensions);
-    notes = parse_notes(formatted_text->str, extensions, references);
-    content = parse_content(formatted_text->str, extensions, references, notes);
+    references = parse_references(formatted_text->content, extensions);
+    notes = parse_notes(formatted_text->content, extensions, references);
+    content = parse_content(formatted_text->content, extensions, references, notes);
 
     content = process_raw_blocks(content, extensions, references, notes);
 

@@ -36,14 +36,14 @@ element *reverse(element *list) {
 
 /* concat_string_list - concatenates string contents of list of STR elements.
  * Frees STR elements as they are added to the concatenation. */
-GString *concat_string_list(element *list) {
-    GString *result;
+string *concat_string_list(element *list) {
+    string *result;
     element *next;
-    result = g_string_new("");
+    result = str_create("");
     while (list != NULL) {
         assert(list->key == STR);
         assert(list->contents.str != NULL);
-        g_string_append(result, list->contents.str);
+        str_append(result, list->contents.str);
         next = list->next;
         free_element(list);
         list = next;
@@ -94,12 +94,12 @@ element * mk_str(char *string) {
  * reversed list of strings, adding optional extra newline */
 element * mk_str_from_list(element *list, bool extra_newline) {
     element *result;
-    GString *c = concat_string_list(reverse(list));
+    string *c = concat_string_list(reverse(list));
     if (extra_newline)
-        g_string_append(c, "\n");
+        str_append(c, "\n");
     result = mk_element(STR);
-    result->contents.str = c->str;
-    g_string_free(c, false);
+    result->contents.str = c->content;
+    str_free_container(c);
     return result;
 }
 

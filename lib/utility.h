@@ -2,7 +2,7 @@
 #define UTILITY_FUNCTIONS_H
 
 #include <stdbool.h>
-#include <glib.h>
+#include "str.h"
 #include "markdownparse.h"
 
 /* utility_functions.h - List manipulation functions, element
@@ -16,7 +16,7 @@ element * cons(element *new, element *list);
 element *reverse(element *list);
 /* concat_string_list - concatenates string contents of list of STR elements.
  * Frees STR elements as they are added to the concatenation. */
-GString *concat_string_list(element *list);
+string *concat_string_list(element *list);
 /**********************************************************************
 
   Global variables used in parsing
