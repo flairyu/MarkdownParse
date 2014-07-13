@@ -57,3 +57,10 @@ iterate over an element `el`s children, do the following:
 
       child = child->next;
     }
+
+Elements with some particular keys also have associated data in their 
+`contents`:
+
+- `STR`: `el->contents.str` contains the string contents
+- `LINK`: `el->contents.link` contains hyperlink data, such as `label`,
+  `url`, and `title`.
