@@ -45,7 +45,8 @@ header and call `parse_markdown`. This returns the root of a tree of
     free_element_tree(document);
 
 Each `element` in the resulting tree has a `key` which denotes its
-semantics. Each `element` also has a list of children (which may be
+semantics. The key of the root element is always `DOCUMENT`. Each
+`element` also has a list of children (which may be
 empty), the head of which is pointed to by `children`. Each child
 has a `next` member pointing to the next child in the list. To
 iterate over an element `el`s children, do the following:
