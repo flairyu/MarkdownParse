@@ -6,7 +6,7 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/markdown_parser.c
                    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/markdown_parser.leg
                    VERBATIM)
 add_library(markdownparse
-            markdownparse.c markdown_parser.c utility.c parse.c odf.c)
+            markdownparse.c markdown_parser.c utility.c parse.c)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${GLIB2_INCLUDE_DIRS}
                     ${CMAKE_SOURCE_DIR}/include)
