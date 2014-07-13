@@ -72,7 +72,7 @@ static element * process_raw_blocks(element *input, int extensions, element *ref
     return input;
 }
 
-element *parse_markdown(const char *markdown, int extensions) {
+element *parse_extended_markdown(const char *markdown, int extensions) {
     element *content;
     element *references;
     element *notes;
@@ -91,6 +91,10 @@ element *parse_markdown(const char *markdown, int extensions) {
     document->children = content;
 
     return document;
+}
+
+element *parse_markdown(const char *markdown) {
+	return parse_extended_markdown(markdown, 0);
 }
 
 void free_element_tree(element * elt) {

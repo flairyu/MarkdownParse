@@ -72,7 +72,8 @@ enum markdown_extensions {
     EXT_STRIKE           = 0x10
 };
 
-element *parse_markdown(const char *string, int extensions);
+element *parse_markdown(const char *string);
+element *parse_extended_markdown(const char *string, int extensions);
 void free_element_tree(element *elt);
 
 #ifdef __cplusplus
