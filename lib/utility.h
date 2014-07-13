@@ -8,6 +8,7 @@
 /* utility_functions.h - List manipulation functions, element
  * constructors, and macro definitions for leg markdown parser. */
 
+char *strdup(char const *s);
 
 /* cons - cons an element onto a list, returning pointer to new head */
 element * cons(element *new, element *list);

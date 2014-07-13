@@ -21,7 +21,6 @@
 #include "utility.h"
 
 
-
 /**********************************************************************
 
   Definitions for leg parser generator.

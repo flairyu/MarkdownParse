@@ -7,7 +7,28 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include <ctype.h>
 
+#include "parse.h"
+
+
+char *strdup(char const *s) {
+    char *d = malloc(strlen(s) + 1);
+    if (d == NULL) return NULL;
+    strcpy(d, s);
+    return d;
+}
+
+static bool strcasecmp(char const *s1, char const *s2) {
+    while (tolower(*s1) == tolower(*s2) &&
+           *s1 != '\0' && *s2 != '\0') {
+        s1++;
+        s2++;
+    }
+
+    return tolower(*s1) - tolower(*s2);
+}
 
 /**********************************************************************
 
