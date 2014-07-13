@@ -8,9 +8,13 @@ bool print_element(element *el, int depth) {
 
 int main()
 {
-	element *document = parse_markdown("Hello\n=====\n\nHello foo *this* is");
+	char const *markdown = "Hello\n=====\n\nHello foo *this* is";
+
+	element *document = parse_markdown(markdown);
 
 	traverse_tree(document, print_element);
+
+	printf("%s\n", format_markdown(markdown, FORMAT_HTML));
 
 	free_element_tree(document);
 	return 0;

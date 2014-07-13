@@ -5,6 +5,7 @@
 #include "parse.h"
 #include "utility.h"
 #include "str.h"
+#include "formats/formats.h"
 
 /* preformat_text - allocate and copy text buffer while
  * performing tab expansion. */
@@ -110,6 +111,20 @@ static void traverse_tree_depth(element *tree, bool (*func)(element *, int), int
 			child = child->next;
 		}
 	}
+}
+
+char *format_tree(element *tree, int format) {
+	if (format == FORMAT_HTML) {
+		return format_tree_html(tree);
+	}
+
+	return NULL;
+}
+
+char *format_markdown(char const *markdown, int format) {
+	element *document = parse_markdown(markdown);
+
+	return format_tree(document, format);
 }
 
 void traverse_tree(element *tree, bool (*func)(element *, int)) {
