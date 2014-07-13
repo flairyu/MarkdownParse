@@ -4,20 +4,45 @@
 #include <string.h>
 #include <assert.h>
 
+static inline size_t nearest_power(size_t num) {
+	const size_t MAX_SIZE = -1;
+
+	if (num > MAX_SIZE / 2) {
+		return MAX_SIZE;
+	}
+
+	size_t power = 1;
+	while (power < num) {
+		power <<= 1;
+	}
+
+	return power;
+}
+
+static void str_expand(string *str, size_t length) {
+	if (str->length + length >= str->allocated_length) {
+		str->allocated_length = nearest_power(str->length + length + 1);
+		str->content = realloc(str->content, str->allocated_length);
+	}
+}
+
 string *str_create(const char *init) {
 	string *result;
-	size_t len;
+	size_t length;
 
 	result = malloc(sizeof(string));
+	result->length = 0;
+	result->allocated_length = 0;
 
 	if (init == NULL) {
 		init = "";
 	}
 
-	len = strlen(init);
-	result->content = malloc((len + 1) * sizeof(char));
-	result->length = len;
+	length = strlen(init);
+
+	str_expand(result, length + 2);
 	strcpy(result->content, init);
+	result->length = length;
 
 	return result;
 }
@@ -37,37 +62,22 @@ char *str_free_container(string *str) {
 }
 
 string *str_append(string *str, const char *annex) {
-	size_t str_length;
-	size_t result_length;
-	char *new_content;
-
 	assert(str != NULL);
 	assert(annex != NULL);
 
-	result_length = str->length + strlen(annex);
-	new_content = malloc((result_length + 1) * sizeof(char));
-	strcpy(new_content, str->content);
-	strcpy(new_content + str->length, annex);
-
-	free(str->content);
-	str->content = new_content;
-	str->length = result_length;
+	str_expand(str, strlen(annex));
+	strcpy(str->content + str->length, annex);
+	str->length = str->length + strlen(annex);
 
 	return str;
 }
 
 string *str_append_char(string *str, char annex) {
-	size_t result_length;
-	char *new_content;
+	assert(str != NULL);
 
-	result_length = str->length + 1;
-	new_content = malloc((result_length + 1) * sizeof(char));
-	strcpy(new_content, str->content);
-	new_content[str->length] = annex;
-
-	free(str->content);
-	str->content = new_content;
-	str->length = result_length;
+	str_expand(str, 1);
+	str->content[str->length] = annex;
+	str->length = str->length + 1;
 
 	return str;
 }

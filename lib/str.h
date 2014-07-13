@@ -6,6 +6,7 @@
 struct string {
 	char *content;
 	size_t length;
+	size_t allocated_length;
 };
 
 typedef struct string string;
