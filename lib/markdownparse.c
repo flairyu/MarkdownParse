@@ -83,6 +83,18 @@ static element * process_raw_blocks(element *input, int extensions, element *ref
 	return input;
 }
 
+char *format_markdown(char const *markdown, int format) {
+	element *document = parse_markdown(markdown);
+	char *output = format_tree(document, format);
+	free_element_tree(document);
+
+	return output;
+}
+
+element *parse_markdown(char const *markdown) {
+	return parse_extended_markdown(markdown, 0);
+}
+
 element *parse_extended_markdown(char const *markdown, int extensions) {
 	string *formatted_text = preformat_text(markdown);
 
@@ -98,21 +110,6 @@ element *parse_extended_markdown(char const *markdown, int extensions) {
 	return document;
 }
 
-element *parse_markdown(char const *markdown) {
-	return parse_extended_markdown(markdown, 0);
-}
-
-static void traverse_tree_depth(element *tree, bool (*func)(element *, int), int depth) {
-	if (func(tree, depth)) {
-		element *child = tree->children;
-
-		while (child != NULL) {
-			traverse_tree_depth(child, func, depth + 1);
-			child = child->next;
-		}
-	}
-}
-
 char *format_tree(element *root, int format) {
 	string *formatted = str_create("");
 
@@ -126,29 +123,32 @@ char *format_tree(element *root, int format) {
 	return result;
 }
 
-char *format_markdown(char const *markdown, int format) {
-	element *document = parse_markdown(markdown);
-	char *output = format_tree(document, format);
-	free_element_tree(document);
+static void traverse_tree_depth(element *root, bool (*func)(element *, int), int depth) {
+	if (func(root, depth)) {
+		element *child = root->children;
 
-	return output;
+		while (child != NULL) {
+			traverse_tree_depth(child, func, depth + 1);
+			child = child->next;
+		}
+	}
 }
 
-void traverse_tree(element *tree, bool (*func)(element *, int)) {
-	traverse_tree_depth(tree, func, 0);
+void traverse_tree(element *root, bool (*func)(element *, int)) {
+	traverse_tree_depth(root, func, 0);
 }
 
-void free_element_tree(element *tree) {
-	while (tree != NULL) {
-		element *next = tree->next;
-		free_element_contents(*tree);
+void free_element_tree(element *root) {
+	while (root != NULL) {
+		element *next = root->next;
+		free_element_contents(*root);
 
-		if (tree->children != NULL) {
-			free_element_tree(tree->children);
-			tree->children = NULL;
+		if (root->children != NULL) {
+			free_element_tree(root->children);
+			root->children = NULL;
 		}
 
-		free(tree);
-		tree = next;
+		free(root);
+		root = next;
 	}
 }

@@ -75,12 +75,23 @@ enum formats {
 	FORMAT_HTML = 0x01,
 };
 
-element *parse_markdown(char const *string);
-element *parse_extended_markdown(char const *string, int extensions);
-char *format_tree(element *root, int format);
+// Convert markdown into the given output format
 char *format_markdown(char const *document, int format);
-void traverse_tree(element *tree, bool (*func)(element *, int));
-void free_element_tree(element *tree);
+
+// Parse markdown into an element tree
+element *parse_markdown(char const *string);
+
+// Parse extended markdown into an element tree
+element *parse_extended_markdown(char const *string, int extensions);
+
+// Convert an element tree into the given output format
+char *format_tree(element *root, int format);
+
+// Apply function to each element in an element tree
+void traverse_tree(element *root, bool (*func)(element *, int));
+
+// Deallocate all elements in an element tree
+void free_element_tree(element *root);
 
 #ifdef __cplusplus
 }
