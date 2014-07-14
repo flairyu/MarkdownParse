@@ -6,6 +6,6 @@ add_dependencies(test_build markdownparse)
 target_link_libraries(test_build markdownparse)
 
 add_custom_target(test
-                  ${CMAKE_CURRENT_BINARY_DIR}/test
+                  ${CMAKE_CURRENT_SOURCE_DIR}/test.py
                   VERBATIM)
 add_dependencies(test test_build)
