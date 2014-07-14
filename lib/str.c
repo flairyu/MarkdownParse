@@ -30,6 +30,7 @@ static void str_expand(string *str, size_t length) {
 
 string *str_create(char const *init) {
 	string *result = malloc(sizeof(string));
+	result->content = NULL;
 	result->length = 0;
 	result->allocated_length = 0;
 
