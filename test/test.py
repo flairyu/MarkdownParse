@@ -73,6 +73,10 @@ def remove_extension(filename):
     return os.path.splitext(filename)[0]
 
 def run_tests():
+    abspath = os.path.abspath(__file__)
+    dname = os.path.dirname(abspath)
+    os.chdir(dname)
+    
     whitespace_re = re.compile(b'\s+')
     
     results = []
