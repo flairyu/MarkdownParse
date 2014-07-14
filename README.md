@@ -21,37 +21,43 @@ Where `$SOURCE_DIR` denotes the directory in which the MarkdownParse
 source resides, create a build directory, generate the build scripts,
 and run `make`:
 
-    $ mkdir build && cd build
-    $ cmake $SOURCE_DIR
-    $ make
+```Shell
+$ mkdir build && cd build
+$ cmake $SOURCE_DIR
+$ make
+```
 
 To install the library and header file:
 
-    $ sudo make install
+```Shell
+$ sudo make install
+```
 
 API Summary
 -----------
 
-    // Convert markdown into the given output format
-    char *format_markdown(char const *document, int format);
-    
-    // Convert extended markdown into the given output format
-    char *format_extended_markdown(char const *document, int extensions, int format);
-    
-    // Parse markdown into an element tree
-    element *parse_markdown(char const *string);
-    
-    // Parse extended markdown into an element tree
-    element *parse_extended_markdown(char const *string, int extensions);
-    
-    // Convert an element tree into the given output format
-    char *format_tree(element *root, int format);
-    
-    // Apply function to each element in an element tree
-    void traverse_tree(element *root, bool (*func)(element *, int));
-    
-    // Deallocate all elements in an element tree
-    void free_element_tree(element *root);
+```C
+// Convert markdown into the given output format
+char *format_markdown(char const *document, int format);
+
+// Convert extended markdown into the given output format
+char *format_extended_markdown(char const *document, int extensions, int format);
+
+// Parse markdown into an element tree
+element *parse_markdown(char const *string);
+
+// Parse extended markdown into an element tree
+element *parse_extended_markdown(char const *string, int extensions);
+
+// Convert an element tree into the given output format
+char *format_tree(element *root, int format);
+
+// Apply function to each element in an element tree
+void traverse_tree(element *root, bool (*func)(element *, int));
+
+// Deallocate all elements in an element tree
+void free_element_tree(element *root);
+```
 
 Basic Usage
 -----------
@@ -62,11 +68,13 @@ link to the library with the `-lmarkdownparse` compiler option.
 To simply convert markdown to HTML, use `format_markdown` or
 `format_extended_markdown`:
 
-    char const *markdown = "MarkdownParse\n=====\n\nThis is *MarkdownParse*.";
-    char *html = format_markdown(markdown, FORMAT_HTML);
+```C
+char const *markdown = "MarkdownParse\n=====\n\nThis is *MarkdownParse*.";
+char *html = format_markdown(markdown, FORMAT_HTML);
 
-    // Later...
-    free(html);
+// Later...
+free(html);
+```
 
 Don't forget to `free` the resulting string.
 
@@ -80,12 +88,14 @@ respectively.
 `element`s. This tree should later be deallocated with
 `free_element_tree`. For example:
 
-    char const *markdown = "MarkdownParse\n=====\n\nThis is *MarkdownParse*.";
-    element *document = parse_markdown(markdown);
+```C
+char const *markdown = "MarkdownParse\n=====\n\nThis is *MarkdownParse*.";
+element *document = parse_markdown(markdown);
 
-    // Process the document
+// Process the document
 
-    free_element_tree(document);
+free_element_tree(document);
+```
 
 Each `element` in the resulting tree has a `key` which denotes its
 semantics. The key of the root element is always `DOCUMENT`. Each
@@ -103,4 +113,6 @@ Elements with some particular keys also have associated data in their
 
 An element tree can be converted to HTML with `format_tree`:
 
-    char *html = format_tree(document, FORMAT_HTML);
+```C
+char *html = format_tree(document, FORMAT_HTML);
+```
