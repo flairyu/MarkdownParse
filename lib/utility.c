@@ -138,6 +138,8 @@ element *mk_list(int key, element *lst) {
 	return result;
 }
 
+static int done = 0;
+
 /* mk_link - constructor for LINK element */
 element *mk_link(element *label, char *url, char *title) {
 	element *result = mk_element(LINK);

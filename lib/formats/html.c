@@ -143,7 +143,7 @@ void format_tree_html(string *output, element *root) {
 				str_append_format(output, "\"");
 			}
 			str_append_format(output, ">");
-			format_children_html(output, root->contents.link->label);
+			format_tree_html(output, root->contents.link->label);
 			str_append_format(output, "</a>");
 			break;
 		case IMAGE:

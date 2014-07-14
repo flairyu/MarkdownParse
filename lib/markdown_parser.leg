@@ -534,8 +534,7 @@ ReferenceLink = ReferenceLinkDouble | ReferenceLinkSingle
 ReferenceLinkDouble =  a:Label < Spnl > !"[]" b:Label
                        {   link match;
                            if (find_reference(&match, b->children)) {
-                               $$ = mk_link(a->children, match.url, match.title);
-                               free(a);
+                               $$ = mk_link(a, match.url, match.title);
                                free_element_tree(b);
                            } else {
                                element *result;
@@ -549,8 +548,7 @@ ReferenceLinkDouble =  a:Label < Spnl > !"[]" b:Label
 ReferenceLinkSingle =  a:Label < (Spnl "[]")? >
                        {   link match;
                            if (find_reference(&match, a->children)) {
-                               $$ = mk_link(a->children, match.url, match.title);
-                               free(a);
+                               $$ = mk_link(a, match.url, match.title);
                            }
                            else {
                                element *result;
@@ -561,10 +559,9 @@ ReferenceLinkSingle =  a:Label < (Spnl "[]")? >
                        }
 
 ExplicitLink =  l:Label '(' Sp s:Source Spnl t:Title Sp ')'
-                { $$ = mk_link(l->children, s->contents.str, t->contents.str);
+                { $$ = mk_link(l, s->contents.str, t->contents.str);
                   free_element(s);
-                  free_element(t);
-                  free(l); }
+                  free_element(t); }
 
 Source  = ( '<' < SourceContents > '>' | < SourceContents > )
           { $$ = mk_str(yytext); }
