@@ -1,39 +1,14 @@
 Licenses
 ========
 
-MarkdownParse
--------------
+- **MarkdownParse**: The MIT License. Derived from peg-markdown. Test suite
+  derived from markdown-testsuite.
+- [**peg-markdown**](https://github.com/jgm/peg-markdown): The MIT License.
+- [**markdown-testsuite**](https://github.com/karlcow/markdown-testsuite):
+  The MIT License.
 
-Copyright (c) Joseph Mansfield
-
-Derived from peg-markdown. 
-
-**The MIT License**
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-peg-markdown
-------------
-
-Copyright (c) 2008-2011 John MacFarlane
-
-**The MIT License**
+The MIT License
+---------------
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

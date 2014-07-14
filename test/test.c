@@ -1,21 +1,23 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "markdownparse.h"
 
-bool print_element(element *el, int depth) {
-	printf("Depth %d: %d\n", depth, el->key);
-}
-
 int main()
 {
-	char const *markdown = "Hello\n=====\n\nHello foo *this* is";
+	char buffer[4096];
+	char *input = NULL;
+	long num_characters = 0;
 
-	element *document = parse_markdown(markdown);
+	while (fgets(buffer, 4096, stdin)) {
+		long prev_num_characters = num_characters;
+		input = realloc(input, num_characters + strlen(buffer) + 1);
+		strcpy(input + prev_num_characters, buffer);
+		num_characters += strlen(buffer);
+	}
 
-	traverse_tree(document, print_element);
+	printf("%s\n", format_markdown(input, FORMAT_HTML));
 
-	printf("%s\n", format_markdown(markdown, FORMAT_HTML));
-
-	free_element_tree(document);
 	return 0;
 }
