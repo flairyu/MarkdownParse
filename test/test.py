@@ -4,6 +4,7 @@ import subprocess
 import re
 import glob
 import os
+import sys
 from HTMLParser import HTMLParser
 from htmlentitydefs import name2codepoint
 
@@ -102,17 +103,20 @@ def run_tests():
 
     for result in results:
         if result:
-            print("."),
+            sys.stdout.write(".")
         else:
-            print("F"),
+            sys.stdout.write("F")
             
-    print("\n\nFailures\n========")
-    for failure in failures:
-        print(failure[0])
-        print("  "),
-        print(failure[1])
-        print("  "),
-        print(failure[2])
+    if len(failures) > 0:
+        print("\n\nFailures\n========")
+        for failure in failures:
+            print(failure[0])
+            print("  "),
+            print(failure[1])
+            print("  "),
+            print(failure[2])
+    else:
+        print("\n\nAll tests passed!")
 
 if __name__ == "__main__":
     run_tests()
