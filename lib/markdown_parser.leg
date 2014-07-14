@@ -600,7 +600,7 @@ Label = '[' ( !'^' &{ extension(EXT_NOTES) } | &. &{ !extension(EXT_NOTES) } )
         ']'
         { $$ = mk_list(LIST, a); }
 
-RefSrc = < Nonspacechar+ > 
+RefSrc = '<'? < UrlChar+ > '>'?
          { $$ = mk_str(yytext); 
            $$->key = HTML; }
 
@@ -651,6 +651,8 @@ HtmlTag =       '<' Spnl '/'? AlphanumericAscii+ Spnl HtmlAttribute* '/'? Spnl '
 Eof =           !.
 Spacechar =     ' ' | '\t'
 Nonspacechar =  !Spacechar !Newline .
+UrlSymbolChar = '-' | '.' | '_' | '~' | ':' | '/' | '?' | '#' | '[' | ']' | '@' | '!' | '$' | '&' | '\'' | '(' | ')' | '*' | '+' | ',' | ';' | '='
+UrlChar =       AlphanumericAscii | UrlSymbolChar
 Newline =       '\n' | '\r' '\n'?
 Sp =            Spacechar*
 Spnl =          Sp (Newline Sp)?
