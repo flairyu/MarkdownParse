@@ -78,6 +78,9 @@ enum formats {
 // Convert markdown into the given output format
 char *format_markdown(char const *document, int format);
 
+// Convert extended markdown into the given output format
+char *format_extended_markdown(char const *document, int extensions, int format);
+
 // Parse markdown into an element tree
 element *parse_markdown(char const *string);
 

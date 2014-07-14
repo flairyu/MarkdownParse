@@ -84,7 +84,11 @@ static element * process_raw_blocks(element *input, int extensions, element *ref
 }
 
 char *format_markdown(char const *markdown, int format) {
-	element *document = parse_markdown(markdown);
+	return format_extended_markdown(markdown, 0, format);
+}
+
+char *format_extended_markdown(char const *markdown, int extensions, int format) {
+	element *document = parse_extended_markdown(markdown, extensions);
 	char *output = format_tree(document, format);
 	free_element_tree(document);
 
