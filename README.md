@@ -3,8 +3,8 @@ MarkdownParse
 
 MarkdownParse is a C library for parsing [markdown][] documents. Unlike
 many existing libraries, which only provide converted output, it
-exposes a simple interface to access the abstract syntax tree of a
-document.
+exposes a simple interface to access the tree of semantic elements for
+a document.
 
 The library is a derived work of [jgm/peg-markdown][] and likewise uses
 a [parsing expression grammar (PEG)][] to define the syntax. This should
@@ -58,6 +58,9 @@ void traverse_tree(element *root, bool (*func)(element *, int));
 // Deallocate all elements in an element tree
 void free_element_tree(element *root);
 ```
+
+For more details, take a look at the public header file
+[`markdownparse.h`](include/markdownparse.h).
 
 Basic Usage
 -----------
