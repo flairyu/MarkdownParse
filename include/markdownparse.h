@@ -77,7 +77,7 @@ enum formats {
 
 element *parse_markdown(char const *string);
 element *parse_extended_markdown(char const *string, int extensions);
-char *format_tree(element *tree, int format);
+char *format_tree(element *root, int format);
 char *format_markdown(char const *document, int format);
 void traverse_tree(element *tree, bool (*func)(element *, int));
 void free_element_tree(element *tree);

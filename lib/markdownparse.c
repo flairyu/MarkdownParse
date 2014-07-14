@@ -113,12 +113,17 @@ static void traverse_tree_depth(element *tree, bool (*func)(element *, int), int
 	}
 }
 
-char *format_tree(element *tree, int format) {
+char *format_tree(element *root, int format) {
+	string *formatted = str_create("");
+
 	if (format == FORMAT_HTML) {
-		return format_tree_html(tree);
+		format_tree_html(formatted, root);
 	}
 
-	return NULL;
+	char *result = formatted->content;
+	str_free_container(formatted);
+
+	return result;
 }
 
 char *format_markdown(char const *markdown, int format) {

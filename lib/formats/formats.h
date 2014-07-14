@@ -2,7 +2,8 @@
 #define FORMATS_H
 
 #include "markdownparse.h"
+#include "str.h"
 
-char *format_tree_html(element *tree);
+void format_tree_html(string *output, element *root);
 
 #endif

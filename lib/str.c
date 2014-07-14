@@ -1,6 +1,8 @@
 #include "str.h"
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <string.h>
 #include <assert.h>
 
@@ -73,6 +75,28 @@ string *str_append_char(string *str, char annex) {
 	str_expand(str, 1);
 	str->content[str->length] = annex;
 	str->length = str->length + 1;
+
+	return str;
+}
+
+string *str_append_format(string *str, const char *format, ...) {
+	assert(str != NULL);
+
+	va_list args;
+	va_start(args, format);
+	int annex_length = vsnprintf(NULL, 0, format, args);
+	va_end(args);
+
+	char *annex = malloc((annex_length + 1) * sizeof(char));
+
+	va_start(args, format);
+	vsnprintf(annex, annex_length + 1, format, args);
+	va_end(args);
+
+	str_append(str, annex);
+
+	free(annex);
+	va_end(args);
 
 	return str;
 }

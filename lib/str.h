@@ -16,5 +16,6 @@ void str_free(string *str);
 char *str_free_container(string *str);
 string *str_append(string *str, const char *annex);
 string *str_append_char(string *str, char annex);
+string *str_append_format(string *str, const char *format, ...);
 
 #endif
