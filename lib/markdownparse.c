@@ -128,8 +128,10 @@ char *format_tree(element *root, int format) {
 
 char *format_markdown(char const *markdown, int format) {
 	element *document = parse_markdown(markdown);
+	char *output = format_tree(document, format);
+	free_element_tree(document);
 
-	return format_tree(document, format);
+	return output;
 }
 
 void traverse_tree(element *tree, bool (*func)(element *, int)) {
