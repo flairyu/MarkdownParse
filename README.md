@@ -17,9 +17,9 @@ a allow easy modification and extension.
 Compilation
 -----------
 
-Where `$SOURCE_DIR` denotes the directory into which the MarkdownParse
-source has been cloned, create a build directory, generate the build
-scripts, and run `make`:
+Where `$SOURCE_DIR` denotes the directory in which the MarkdownParse
+source resides, create a build directory, generate the build scripts,
+and run `make`:
 
     $ mkdir build && cd build
     $ cmake $SOURCE_DIR
@@ -29,15 +29,58 @@ To install the library and header file:
 
     $ sudo make install
 
-Usage
------
+API Summary
+-----------
 
-To use MarkdownParse in your code, include the `<markdownparse.h>`
-header and call `parse_markdown`. This returns the root of a tree of
+    // Convert markdown into the given output format
+    char *format_markdown(char const *document, int format);
+    
+    // Convert extended markdown into the given output format
+    char *format_extended_markdown(char const *document, int extensions, int format);
+    
+    // Parse markdown into an element tree
+    element *parse_markdown(char const *string);
+    
+    // Parse extended markdown into an element tree
+    element *parse_extended_markdown(char const *string, int extensions);
+    
+    // Convert an element tree into the given output format
+    char *format_tree(element *root, int format);
+    
+    // Apply function to each element in an element tree
+    void traverse_tree(element *root, bool (*func)(element *, int));
+    
+    // Deallocate all elements in an element tree
+    void free_element_tree(element *root);
+
+Basic Usage
+-----------
+
+To use MarkdownParse, you'll need to `#include <markdownparse.h>` and
+link to the library with the `-lmarkdownparse` compiler option.
+
+To simply convert markdown to HTML, use `format_markdown` or
+`format_extended_markdown`:
+
+    char const *markdown = "MarkdownParse\n=====\n\nThis is *MarkdownParse*.";
+    char *html = format_markdown(markdown, FORMAT_HTML);
+
+    // Later...
+    free(html);
+
+Don't forget to `free` the resulting string.
+
+The process of formatting markdown as HTML (or any other format) is
+divided into two steps: parse the markdown into an element tree, then
+convert that tree to the appropriate function. These steps can be
+performed individually with `parse_markdown` and `format_tree`
+respectively.
+
+`parse_markdown` takes some markdown and returns the root of a tree of
 `element`s. This tree should later be deallocated with
 `free_element_tree`. For example:
 
-    const char* markdown = "MarkdownParse\n=====\n\nThis is *MarkdownParse*.";
+    char const *markdown = "MarkdownParse\n=====\n\nThis is *MarkdownParse*.";
     element *document = parse_markdown(markdown);
 
     // Process the document
@@ -46,21 +89,18 @@ header and call `parse_markdown`. This returns the root of a tree of
 
 Each `element` in the resulting tree has a `key` which denotes its
 semantics. The key of the root element is always `DOCUMENT`. Each
-`element` also has a list of children (which may be
-empty), the head of which is pointed to by `children`. Each child
-has a `next` member pointing to the next child in the list. To
-iterate over an element `el`s children, do the following:
-
-    element *child = el->children;
-    while (child != NULL) {
-      // Process child
-
-      child = child->next;
-    }
+`element` also has a list of children (which may be empty), the head of
+which is pointed to by `children`. Each child has a `next` member
+pointing to the next child in the list. You can quickly apply a function
+to every `element` in a tree with `traverse_tree`.
 
 Elements with some particular keys also have associated data in their 
 `contents`:
 
 - `STR`: `el->contents.str` contains the string contents
-- `LINK`: `el->contents.link` contains hyperlink data, such as `label`,
-  `url`, and `title`.
+- `LINK` and `IMAGE`: `el->contents.link` contains hyperlink or image
+  data, such as `label`, `url`, and `title`.
+
+An element tree can be converted to HTML with `format_tree`:
+
+    char *html = format_tree(document, FORMAT_HTML);
