@@ -116,3 +116,50 @@ An element tree can be converted to HTML with `format_tree`:
 ```C
 char *html = format_tree(document, FORMAT_HTML);
 ```
+
+Example
+-------
+
+The following program parses a markdown document and replaces all of its
+*emphasis* elements with **strong** elements before converting it to
+HTML:
+
+```C
+#include <stdio.h>
+#include <stdbool.h>
+#include <markdownparse.h>
+
+bool swap_emph_for_strong(element *el, int depth) {
+	if (el->key == EMPH) {
+		el->key = STRONG;
+	}
+
+	return true;
+}
+
+int main(int argc, const char *argv[]) {
+	char const *markdown =
+		"Test\n"
+		"====\n"
+		"\n"
+		"This is an example *markdown document* to demonstrate\n"
+		"the use of the *MarkdownParse* C library.";
+
+	element *document = parse_markdown(markdown);
+
+	traverse_tree(document, swap_emph_for_strong);
+
+	printf("%s\n", format_tree(document, FORMAT_HTML));
+
+	free_element_tree(document);
+}
+```
+
+Output:
+
+```
+<h1>Test</h1>
+
+<p>This is an example <strong>markdown document</strong> to demonstrate
+the use of the <strong>MarkdownParse</strong> C library.</p>
+```
