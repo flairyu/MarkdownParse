@@ -79,21 +79,20 @@ static void format_string_html(string *output, char *str) {
 	}
 }
 
+static void format_element_html(string *output, element *toor);
+
 static void format_children_html(string *output, element *parent) {
 	element *child = parent->children;
 	while (child != NULL) {
-		format_tree_html(output, child);
+		format_element_html(output, child);
 
 		child = child->next;
 	}
 }
 
-void format_tree_html(string *output, element *root) {
+static void format_element_html(string *output, element *root) {
 	int lev;
 	switch (root->key) {
-		case DOCUMENT:
-			format_children_html(output, root);
-			break;
 		case SPACE:
 			str_append_format(output, "%s", root->contents.str);
 			break;
@@ -269,8 +268,12 @@ void format_tree_html(string *output, element *root) {
 			fprintf(stderr, "print_html_element encountered unknown element key = %d\n", root->key); 
 			exit(EXIT_FAILURE);
 	}
+}
 
-	if (root->key == DOCUMENT && endnotes != NULL) {
+void format_tree_html(string *output, element *root) {
+	format_element_html(output, root);
+
+	if (endnotes != NULL) {
 		pad(output, 2);
 		format_endnotes_html(output);
 	}

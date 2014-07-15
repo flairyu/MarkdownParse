@@ -108,7 +108,7 @@ element *parse_extended_markdown(char const *markdown, int extensions) {
 
 	content = process_raw_blocks(content, extensions, references, notes);
 
-	element *document = mk_element(DOCUMENT);
+	element *document = mk_element(LIST);
 	document->children = content;
 
 	return document;

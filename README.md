@@ -101,7 +101,7 @@ free_element_tree(document);
 ```
 
 Each `element` in the resulting tree has a `key` which denotes its
-semantics. The key of the root element is always `DOCUMENT`. Each
+semantics. The key of the root element is always `LIST`. Each
 `element` also has a list of children (which may be empty), the head of
 which is pointed to by `children`. Each child has a `next` member
 pointing to the next child in the list. You can quickly apply a function

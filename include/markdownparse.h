@@ -22,8 +22,7 @@ union contents {
 
 // Semantic keys for elements
 enum keys {
-	DOCUMENT,     // The root of a markdown document
-	LIST,         // A generic list
+	LIST,         // An element used only to contain its children
 	RAW,          // Raw markdown to be further processed
 	SPACE,
 	LINEBREAK,
