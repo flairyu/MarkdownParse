@@ -143,16 +143,13 @@ void traverse_tree(element *root, bool (*func)(element *, int)) {
 }
 
 void free_element_tree(element *root) {
-	while (root != NULL) {
-		element *next = root->next;
-		free_element_contents(*root);
+	element *child = root->children;
 
-		if (root->children != NULL) {
-			free_element_tree(root->children);
-			root->children = NULL;
-		}
-
-		free(root);
-		root = next;
+	while (child != NULL) {
+		free_element_tree(child);
+		child = child->next;
 	}
+
+	free_element_contents(*root);
+	free(root);
 }
