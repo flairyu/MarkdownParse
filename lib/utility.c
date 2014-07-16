@@ -37,17 +37,17 @@ static bool strcasecmp(char const *s1, char const *s2) {
  ***********************************************************************/
 
 /* cons - cons an element onto a list, returning pointer to new head */
-element *cons(element *new, element *list) {
+mdp_element *cons(mdp_element *new, mdp_element *list) {
 	assert(new != NULL);
 	new->next = list;
 	return new;
 }
 
 /* reverse - reverse a list, returning pointer to new list */
-element *reverse(element *list) {
-	element *new = NULL;
+mdp_element *reverse(mdp_element *list) {
+	mdp_element *new = NULL;
 	while (list != NULL) {
-		element *next = list->next;
+		mdp_element *next = list->next;
 		new = cons(list, new);
 		list = next;
 	}
@@ -57,14 +57,14 @@ element *reverse(element *list) {
 
 /* concat_string_list - concatenates string contents of list of STR elements.
  * Frees STR elements as they are added to the concatenation. */
-string *concat_string_list(element *list) {
+string *concat_string_list(mdp_element *list) {
 	string *result = str_create("");
 	while (list != NULL) {
-		assert(list->key == STR);
+		assert(list->key == MDP_STR);
 		assert(list->contents.str != NULL);
 
 		str_append(result, list->contents.str);
-		element *next = list->next;
+		mdp_element *next = list->next;
 		free_element(list);
 		list = next;
 	}
@@ -79,9 +79,9 @@ string *concat_string_list(element *list) {
  ***********************************************************************/
 
 char *charbuf = "";     /* Buffer of characters to be parsed. */
-element *references = NULL;    /* List of link references found. */
-element *notes = NULL;         /* List of footnotes found. */
-element *parse_result;  /* Results of parse. */
+mdp_element *references = NULL;    /* List of link references found. */
+mdp_element *notes = NULL;         /* List of footnotes found. */
+mdp_element *parse_result;  /* Results of parse. */
 int syntax_extensions;  /* Syntax extensions selected. */
 
 /**********************************************************************
@@ -93,8 +93,8 @@ int syntax_extensions;  /* Syntax extensions selected. */
  ***********************************************************************/
 
 /* mk_element - generic constructor for element */
-element *mk_element(int key) {
-	element *result = malloc(sizeof(element));
+mdp_element *mk_element(int key) {
+	mdp_element *result = malloc(sizeof(mdp_element));
 	result->key = key;
 	result->children = NULL;
 	result->next = NULL;
@@ -104,9 +104,9 @@ element *mk_element(int key) {
 }
 
 /* mk_str - constructor for STR element */
-element *mk_str(char *string) {
+mdp_element *mk_str(char *string) {
 	assert(string != NULL);
-	element *result = mk_element(STR);
+	mdp_element *result = mk_element(MDP_STR);
 	result->contents.str = strdup(string);
 
 	return result;
@@ -114,14 +114,14 @@ element *mk_str(char *string) {
 
 /* mk_str_from_list - makes STR element by concatenating a
  * reversed list of strings, adding optional extra newline */
-element *mk_str_from_list(element *list, bool extra_newline) {
+mdp_element *mk_str_from_list(mdp_element *list, bool extra_newline) {
 	string *c = concat_string_list(reverse(list));
 
 	if (extra_newline) {
 		str_append(c, "\n");
 	}
 
-	element *result = mk_element(STR);
+	mdp_element *result = mk_element(MDP_STR);
 	result->contents.str = c->content;
 	str_free_container(c);
 
@@ -131,8 +131,8 @@ element *mk_str_from_list(element *list, bool extra_newline) {
 /* mk_list - makes new list with key 'key' and children the reverse of 'lst'.
  * This is designed to be used with cons to build lists in a parser action.
  * The reversing is necessary because cons adds to the head of a list. */
-element *mk_list(int key, element *lst) {
-	element *result = mk_element(key);
+mdp_element *mk_list(int key, mdp_element *lst) {
+	mdp_element *result = mk_element(key);
 	result->children = reverse(lst);
 
 	return result;
@@ -141,9 +141,9 @@ element *mk_list(int key, element *lst) {
 static int done = 0;
 
 /* mk_link - constructor for LINK element */
-element *mk_link(element *label, char *url, char *title) {
-	element *result = mk_element(LINK);
-	result->contents.link = malloc(sizeof(link));
+mdp_element *mk_link(mdp_element *label, char *url, char *title) {
+	mdp_element *result = mk_element(MDP_LINK);
+	result->contents.link = malloc(sizeof(mdp_link));
 	result->contents.link->label = label;
 	result->contents.link->url = strdup(url);
 	result->contents.link->title = strdup(title);
@@ -157,34 +157,34 @@ bool extension(int ext) {
 }
 
 /* match_inlines - returns true if inline lists match (case-insensitive...) */
-bool match_inlines(element *l1, element *l2) {
+bool match_inlines(mdp_element *l1, mdp_element *l2) {
 	while (l1 != NULL && l2 != NULL) {
 		if (l1->key != l2->key)
 			return false;
 		switch (l1->key) {
-			case SPACE:
-			case LINEBREAK:
-			case ELLIPSIS:
-			case EMDASH:
-			case ENDASH:
-			case APOSTROPHE:
+			case MDP_SPACE:
+			case MDP_LINEBREAK:
+			case MDP_ELLIPSIS:
+			case MDP_EMDASH:
+			case MDP_ENDASH:
+			case MDP_APOSTROPHE:
 				break;
-			case CODE:
-			case STR:
-			case HTML:
+			case MDP_CODE:
+			case MDP_STR:
+			case MDP_HTML:
 				if (strcasecmp(l1->contents.str, l2->contents.str) != 0)
 					return false;
 				break;
-			case EMPH:
-			case STRONG:
-			case LIST:
-			case SINGLEQUOTED:
-			case DOUBLEQUOTED:
+			case MDP_EMPH:
+			case MDP_STRONG:
+			case MDP_LIST:
+			case MDP_SINGLEQUOTED:
+			case MDP_DOUBLEQUOTED:
 				if (!match_inlines(l1->children, l2->children))
 					return false;
 				break;
-			case LINK:
-			case IMAGE:
+			case MDP_LINK:
+			case MDP_IMAGE:
 				return false;  /* No links or images within links */
 			default:
 				fprintf(stderr, "match_inlines encountered unknown key = %d\n", l1->key);
@@ -199,11 +199,11 @@ bool match_inlines(element *l1, element *l2) {
 
 /* find_reference - return true if link found in references matching label.
  * 'link' is modified with the matching url and title. */
-bool find_reference(link *result, element *label) {
-	element *cur = references;  /* pointer to walk up list of references */
+bool find_reference(mdp_link *result, mdp_element *label) {
+	mdp_element *cur = references;  /* pointer to walk up list of references */
 
 	while (cur != NULL) {
-		link *curitem = cur->contents.link;
+		mdp_link *curitem = cur->contents.link;
 
 		if (match_inlines(label, curitem->label)) {
 			*result = *curitem;
@@ -218,8 +218,8 @@ bool find_reference(link *result, element *label) {
 
 /* find_note - return true if note found in notes matching label.
 	 if found, 'result' is set to point to matched note. */
-bool find_note(element **result, char *label) {
-	element *cur = notes;
+bool find_note(mdp_element **result, char *label) {
+	mdp_element *cur = notes;
 
 	while (cur != NULL) {
 		if (strcmp(label, cur->contents.str) == 0) {

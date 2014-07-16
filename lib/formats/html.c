@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 static int padded = 2;
-static element **endnotes = NULL;
+static mdp_element **endnotes = NULL;
 static int num_endnotes = 0;
 
 static void pad(string *out, int num) {
@@ -16,10 +16,10 @@ static void pad(string *out, int num) {
 }
 
 /* add_endnote - add an endnote to global endnotes list. */
-static void add_endnote(element *endnote) {
+static void add_endnote(mdp_element *endnote) {
 	num_endnotes++;
 
-	element **new_endnotes = malloc(num_endnotes * sizeof(element*));
+	mdp_element **new_endnotes = malloc(num_endnotes * sizeof(mdp_element*));
 	for (int i = 0; i < num_endnotes-1; i++) {
 		new_endnotes[i] = endnotes[i];
 	}
@@ -39,7 +39,7 @@ static void format_endnotes_html(string *output) {
 	str_append_format(output, "<hr/>\n<ol id=\"notes\">");
 
 	for (int i = num_endnotes - 1; i >= 0; i--) {
-		element *note = endnotes[i];
+		mdp_element *note = endnotes[i];
 		counter++;
 		pad(output, 1);
 		str_append_format(output, "<li id=\"fn%d\">\n", counter);
@@ -79,10 +79,10 @@ static void format_string_html(string *output, char *str) {
 	}
 }
 
-static void format_element_html(string *output, element *toor);
+static void format_element_html(string *output, mdp_element *toor);
 
-static void format_children_html(string *output, element *parent) {
-	element *child = parent->children;
+static void format_children_html(string *output, mdp_element *parent) {
+	mdp_element *child = parent->children;
 	while (child != NULL) {
 		format_element_html(output, child);
 
@@ -90,49 +90,49 @@ static void format_children_html(string *output, element *parent) {
 	}
 }
 
-static void format_element_html(string *output, element *root) {
+static void format_element_html(string *output, mdp_element *root) {
 	int lev;
 	switch (root->key) {
-		case SPACE:
+		case MDP_SPACE:
 			str_append_format(output, "%s", root->contents.str);
 			break;
-		case LINEBREAK:
+		case MDP_LINEBREAK:
 			str_append_format(output, "<br/>\n");
 			break;
-		case STR:
+		case MDP_STR:
 			format_string_html(output, root->contents.str);
 			break;
-		case ELLIPSIS:
+		case MDP_ELLIPSIS:
 			str_append_format(output, "&hellip;");
 			break;
-		case EMDASH:
+		case MDP_EMDASH:
 			str_append_format(output, "&mdash;");
 			break;
-		case ENDASH:
+		case MDP_ENDASH:
 			str_append_format(output, "&ndash;");
 			break;
-		case APOSTROPHE:
+		case MDP_APOSTROPHE:
 			str_append_format(output, "&rsquo;");
 			break;
-		case SINGLEQUOTED:
+		case MDP_SINGLEQUOTED:
 			str_append_format(output, "&lsquo;");
 			format_children_html(output, root);
 			str_append_format(output, "&rsquo;");
 			break;
-		case DOUBLEQUOTED:
+		case MDP_DOUBLEQUOTED:
 			str_append_format(output, "&ldquo;");
 			format_children_html(output, root);
 			str_append_format(output, "&rdquo;");
 			break;
-		case CODE:
+		case MDP_CODE:
 			str_append_format(output, "<code>");
 			format_string_html(output, root->contents.str);
 			str_append_format(output, "</code>");
 			break;
-		case HTML:
+		case MDP_HTML:
 			str_append_format(output, "%s", root->contents.str);
 			break;
-		case LINK:
+		case MDP_LINK:
 			str_append_format(output, "<a href=\"");
 			format_string_html(output, root->contents.link->url);
 			str_append_format(output, "\"");
@@ -145,7 +145,7 @@ static void format_element_html(string *output, element *root) {
 			format_tree_html(output, root->contents.link->label);
 			str_append_format(output, "</a>");
 			break;
-		case IMAGE:
+		case MDP_IMAGE:
 			str_append_format(output, "<img src=\"");
 			format_string_html(output, root->contents.link->url);
 			str_append_format(output, "\" alt=\"");
@@ -158,66 +158,66 @@ static void format_element_html(string *output, element *root) {
 			}
 			str_append_format(output, " />");
 			break;
-		case EMPH:
+		case MDP_EMPH:
 			str_append_format(output, "<em>");
 			format_children_html(output, root);
 			str_append_format(output, "</em>");
 			break;
-		case STRONG:
+		case MDP_STRONG:
 			str_append_format(output, "<strong>");
 			format_children_html(output, root);
 			str_append_format(output, "</strong>");
 			break;
-		case STRIKE:
+		case MDP_STRIKE:
 			str_append_format(output, "<del>");
 			format_children_html(output, root);
 			str_append_format(output, "</del>");
 			break;
-		case LIST:
+		case MDP_LIST:
 			format_children_html(output, root);
 			break;
-		case RAW:
+		case MDP_RAW:
 			/* Shouldn't occur - these are handled by process_raw_blocks() */
-			assert(root->key != RAW);
+			assert(root->key != MDP_RAW);
 			break;
-		case H1: case H2: case H3: case H4: case H5: case H6:
-			lev = root->key - H1 + 1;  /* assumes H1 ... H6 are in order */
+		case MDP_H1: case MDP_H2: case MDP_H3: case MDP_H4: case MDP_H5: case MDP_H6:
+			lev = root->key - MDP_H1 + 1;  /* assumes H1 ... H6 are in order */
 			pad(output, 2);
 			str_append_format(output, "<h%1d>", lev);
 			format_children_html(output, root);
 			str_append_format(output, "</h%1d>", lev);
 			padded = 0;
 			break;
-		case PLAIN:
+		case MDP_PLAIN:
 			pad(output, 1);
 			format_children_html(output, root);
 			padded = 0;
 			break;
-		case PARA:
+		case MDP_PARA:
 			pad(output, 2);
 			str_append_format(output, "<p>");
 			format_children_html(output, root);
 			str_append_format(output, "</p>");
 			padded = 0;
 			break;
-		case HRULE:
+		case MDP_HRULE:
 			pad(output, 2);
 			str_append_format(output, "<hr />");
 			padded = 0;
 			break;
-		case HTMLBLOCK:
+		case MDP_HTMLBLOCK:
 			pad(output, 2);
 			str_append_format(output, "%s", root->contents.str);
 			padded = 0;
 			break;
-		case VERBATIM:
+		case MDP_VERBATIM:
 			pad(output, 2);
 			str_append_format(output, "%s", "<pre><code>");
 			format_string_html(output, root->contents.str);
 			str_append_format(output, "%s", "</code></pre>");
 			padded = 0;
 			break;
-		case BULLETLIST:
+		case MDP_BULLETLIST:
 			pad(output, 2);
 			str_append_format(output, "%s", "<ul>");
 			padded = 0;
@@ -226,7 +226,7 @@ static void format_element_html(string *output, element *root) {
 			str_append_format(output, "%s", "</ul>");
 			padded = 0;
 			break;
-		case ORDEREDLIST:
+		case MDP_ORDEREDLIST:
 			pad(output, 2);
 			str_append_format(output, "%s", "<ol>");
 			padded = 0;
@@ -235,7 +235,7 @@ static void format_element_html(string *output, element *root) {
 			str_append_format(output, "</ol>");
 			padded = 0;
 			break;
-		case LISTITEM:
+		case MDP_LISTITEM:
 			pad(output, 1);
 			str_append_format(output, "<li>");
 			padded = 2;
@@ -243,7 +243,7 @@ static void format_element_html(string *output, element *root) {
 			str_append_format(output, "</li>");
 			padded = 0;
 			break;
-		case BLOCKQUOTE:
+		case MDP_BLOCKQUOTE:
 			pad(output, 2);
 			str_append_format(output, "<blockquote>\n");
 			padded = 2;
@@ -252,10 +252,10 @@ static void format_element_html(string *output, element *root) {
 			str_append_format(output, "</blockquote>");
 			padded = 0;
 			break;
-		case REFERENCE:
+		case MDP_REFERENCE:
 			/* Nonprinting */
 			break;
-		case NOTE:
+		case MDP_NOTE:
 			/* if contents.str == 0, then print note; else ignore, since this
 			 * is a note block that has been incorporated into the notes list */
 			if (root->contents.str == 0) {
@@ -270,7 +270,7 @@ static void format_element_html(string *output, element *root) {
 	}
 }
 
-void format_tree_html(string *output, element *root) {
+void format_tree_html(string *output, mdp_element *root) {
 	format_element_html(output, root);
 
 	if (endnotes != NULL) {

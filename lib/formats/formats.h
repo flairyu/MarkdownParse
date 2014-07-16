@@ -4,6 +4,6 @@
 #include "markdownparse.h"
 #include "str.h"
 
-void format_tree_html(string *output, element *root);
+void format_tree_html(string *output, mdp_element *root);
 
 #endif

@@ -17,7 +17,7 @@ int main()
 		num_characters += strlen(buffer);
 	}
 
-	printf("%s\n", format_markdown(input, FORMAT_HTML));
+	printf("%s\n", mdp_format_markdown(input, MDP_FORMAT_HTML));
 
 	return 0;
 }

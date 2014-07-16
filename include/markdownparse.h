@@ -8,92 +8,92 @@ extern "C" {
 #endif
 
 // Hyperlink data
-typedef struct link {
-	struct element *label;
+typedef struct mdp_link {
+	struct mdp_element *label;
 	char *url;
 	char *title;    
-} link;
+} mdp_link;
 
 // Element contents
-union contents {
+union mdp_contents {
 	char *str;
-	link *link;
+	mdp_link *link;
 };
 
 // Semantic keys for elements
 enum keys {
-	LIST,         // An element used only to contain its children
-	RAW,          // Raw markdown to be further processed
-	SPACE,
-	LINEBREAK,
-	ELLIPSIS,
-	EMDASH,
-	ENDASH,
-	APOSTROPHE,
-	SINGLEQUOTED,
-	DOUBLEQUOTED,
-	STR,          // Text content
-	LINK,
-	IMAGE,
-	CODE,
-	HTML,
-	EMPH,
-	STRONG,
-	STRIKE,
-	PLAIN,
-	PARA,
-	LISTITEM,
-	BULLETLIST,
-	ORDEREDLIST,
-	H1, H2, H3, H4, H5, H6,
-	BLOCKQUOTE,
-	VERBATIM,
-	HTMLBLOCK,
-	HRULE,
-	REFERENCE,
-	NOTE
+	MDP_LIST,         // An element used only to contain its children
+	MDP_RAW,          // Raw markdown to be further processed
+	MDP_SPACE,
+	MDP_LINEBREAK,
+	MDP_ELLIPSIS,
+	MDP_EMDASH,
+	MDP_ENDASH,
+	MDP_APOSTROPHE,
+	MDP_SINGLEQUOTED,
+	MDP_DOUBLEQUOTED,
+	MDP_STR,          // Text content
+	MDP_LINK,
+	MDP_IMAGE,
+	MDP_CODE,
+	MDP_HTML,
+	MDP_EMPH,
+	MDP_STRONG,
+	MDP_STRIKE,
+	MDP_PLAIN,
+	MDP_PARA,
+	MDP_LISTITEM,
+	MDP_BULLETLIST,
+	MDP_ORDEREDLIST,
+	MDP_H1, MDP_H2, MDP_H3, MDP_H4, MDP_H5, MDP_H6,
+	MDP_BLOCKQUOTE,
+	MDP_VERBATIM,
+	MDP_HTMLBLOCK,
+	MDP_HRULE,
+	MDP_REFERENCE,
+	MDP_NOTE
 };
 
 // Element of the abstract syntax tree
-typedef struct element {
+typedef struct mdp_element {
 	int key;
-	union contents contents;
-	struct element *children;
-	struct element *next;
-} element;
+	union mdp_contents contents;
+	struct mdp_element *children;
+	struct mdp_element *next;
+} mdp_element;
 
 enum markdown_extensions {
-	EXT_SMART         = 0x01,
-	EXT_NOTES         = 0x02,
-	EXT_FILTER_HTML   = 0x04,
-	EXT_FILTER_STYLES = 0x08,
-	EXT_STRIKE        = 0x10
+	MDP_EXT_SMART         = 0x01,
+	MDP_EXT_NOTES         = 0x02,
+	MDP_EXT_FILTER_HTML   = 0x04,
+	MDP_EXT_FILTER_STYLES = 0x08,
+	MDP_EXT_STRIKE        = 0x10
 };
 
 enum formats {
-	FORMAT_HTML = 0x01,
+	MDP_FORMAT_HTML = 0x01,
 };
 
 // Convert markdown into the given output format
-char *format_markdown(char const *document, int format);
+char *mdp_format_markdown(char const *document, int format);
 
 // Convert extended markdown into the given output format
-char *format_extended_markdown(char const *document, int extensions, int format);
+char *mdp_format_extended_markdown(char const *document, int extensions, int format);
 
 // Parse markdown into an element tree
-element *parse_markdown(char const *string);
+mdp_element *mdp_parse_markdown(char const *string);
 
 // Parse extended markdown into an element tree
-element *parse_extended_markdown(char const *string, int extensions);
+mdp_element *mdp_parse_extended_markdown(char const *string, int extensions);
 
 // Convert an element tree into the given output format
-char *format_tree(element *root, int format);
+char *mdp_format_tree(mdp_element *root, int format);
 
 // Apply function to each element in an element tree
-void traverse_tree(element *root, bool (*func)(element *, int));
+void mdp_traverse_tree(mdp_element *root, bool (*func)(mdp_element *el, int depth));
 
 // Deallocate all elements in an element tree
-void free_element_tree(element *root);
+void mdp_free_element_tree(mdp_element *root);
 
 #ifdef __cplusplus
 }

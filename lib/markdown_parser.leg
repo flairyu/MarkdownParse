@@ -31,7 +31,7 @@
 
 
 
-# define YYSTYPE element *
+# define YYSTYPE mdp_element *
 #ifdef __DEBUG__
 # define YY_DEBUG 1
 #endif
@@ -76,15 +76,15 @@ Block =     BlankLine*
             | Plain )
 
 Para =      NonindentSpace a:Inlines BlankLine+
-            { $$ = a; $$->key = PARA; }
+            { $$ = a; $$->key = MDP_PARA; }
 
 Plain =     a:Inlines
-            { $$ = a; $$->key = PLAIN; }
+            { $$ = a; $$->key = MDP_PLAIN; }
 
 AtxInline = !Newline !(Sp '#'* Sp Newline) Inline
 
 AtxStart =  < ( "######" | "#####" | "####" | "###" | "##" | "#" ) >
-            { $$ = mk_element(H1 + (strlen(yytext) - 1)); }
+            { $$ = mk_element(MDP_H1 + (strlen(yytext) - 1)); }
 
 AtxHeading = s:AtxStart Sp a:StartList ( AtxInline { a = cons($$, a); } )+ (Sp '#'* Sp)?  Newline
             { $$ = mk_list(s->key, a);
@@ -98,16 +98,16 @@ SetextBottom2 = '-'+ Newline
 
 SetextHeading1 =  &(RawLine SetextBottom1)
                   a:StartList ( !Endline Inline { a = cons($$, a); } )+ Sp Newline
-                  SetextBottom1 { $$ = mk_list(H1, a); }
+                  SetextBottom1 { $$ = mk_list(MDP_H1, a); }
 
 SetextHeading2 =  &(RawLine SetextBottom2)
                   a:StartList ( !Endline Inline { a = cons($$, a); } )+ Sp Newline
-                  SetextBottom2 { $$ = mk_list(H2, a); }
+                  SetextBottom2 { $$ = mk_list(MDP_H2, a); }
 
 Heading = SetextHeading | AtxHeading
 
 BlockQuote = a:BlockQuoteRaw
-             {  $$ = mk_element(BLOCKQUOTE);
+             {  $$ = mk_element(MDP_BLOCKQUOTE);
                 $$->children = a;
              }
 
@@ -117,7 +117,7 @@ BlockQuoteRaw =  a:StartList
                   ( BlankLine { a = cons(mk_str("\n"), a); } )*
                  )+
                  {   $$ = mk_str_from_list(a, true);
-                     $$->key = RAW;
+                     $$->key = MDP_RAW;
                  }
 
 NonblankIndentedLine = !BlankLine IndentedLine
@@ -129,43 +129,43 @@ VerbatimChunk = a:StartList
 
 Verbatim =     a:StartList ( VerbatimChunk { a = cons($$, a); } )+
                { $$ = mk_str_from_list(a, false);
-                 $$->key = VERBATIM; }
+                 $$->key = MDP_VERBATIM; }
 
 HorizontalRule = NonindentSpace
                  ( '*' Sp '*' Sp '*' (Sp '*')*
                  | '-' Sp '-' Sp '-' (Sp '-')*
                  | '_' Sp '_' Sp '_' (Sp '_')*)
                  Sp Newline BlankLine+
-                 { $$ = mk_element(HRULE); }
+                 { $$ = mk_element(MDP_HRULE); }
 
 Bullet = !HorizontalRule NonindentSpace ('+' | '*' | '-') Spacechar+
 
 BulletList = &Bullet (ListTight | ListLoose)
-             { $$->key = BULLETLIST; }
+             { $$->key = MDP_BULLETLIST; }
 
 ListTight = a:StartList
             ( ListItemTight { a = cons($$, a); } )+
             BlankLine* !(Bullet | Enumerator)
-            { $$ = mk_list(LIST, a); }
+            { $$ = mk_list(MDP_LIST, a); }
 
 ListLoose = a:StartList
             ( b:ListItem BlankLine*
-              {   element *li;
+              {   mdp_element *li;
                   li = b->children;
                   li->contents.str = realloc(li->contents.str, strlen(li->contents.str) + 3);
                   strcat(li->contents.str, "\n\n");  /* In loose list, \n\n added to end of each element */
                   a = cons(b, a);
               } )+
-            { $$ = mk_list(LIST, a); }
+            { $$ = mk_list(MDP_LIST, a); }
 
 ListItem =  ( Bullet | Enumerator )
             a:StartList
             ListBlock { a = cons($$, a); }
             ( ListContinuationBlock { a = cons($$, a); } )*
-            {  element *raw;
+            {  mdp_element *raw;
                raw = mk_str_from_list(a, false);
-               raw->key = RAW;
-               $$ = mk_element(LISTITEM);
+               raw->key = MDP_RAW;
+               $$ = mk_element(MDP_LISTITEM);
                $$->children = raw;
             }
 
@@ -176,10 +176,10 @@ ListItemTight =
             ( !BlankLine
               ListContinuationBlock { a = cons($$, a); } )*
             !ListContinuationBlock
-            {  element *raw;
+            {  mdp_element *raw;
                raw = mk_str_from_list(a, false);
-               raw->key = RAW;
-               $$ = mk_element(LISTITEM);
+               raw->key = MDP_RAW;
+               $$ = mk_element(MDP_LISTITEM);
                $$->children = raw;
             }
 
@@ -200,7 +200,7 @@ ListContinuationBlock = a:StartList
 Enumerator = NonindentSpace [0-9]+ '.' Spacechar+
 
 OrderedList = &Enumerator (ListTight | ListLoose)
-              { $$->key = ORDEREDLIST; }
+              { $$->key = MDP_ORDEREDLIST; }
 
 ListBlockLine = !BlankLine
                 !( Indent? (Bullet | Enumerator) )
@@ -383,11 +383,11 @@ HtmlBlockInTags = HtmlBlockAddress
 
 HtmlBlock = < ( HtmlBlockInTags | HtmlComment | HtmlBlockSelfClosing ) >
             BlankLine+
-            {   if (extension(EXT_FILTER_HTML)) {
-                    $$ = mk_list(LIST, NULL);
+            {   if (extension(MDP_EXT_FILTER_HTML)) {
+                    $$ = mk_list(MDP_LIST, NULL);
                 } else {
                     $$ = mk_str(yytext);
-                    $$->key = HTMLBLOCK;
+                    $$->key = MDP_HTMLBLOCK;
                 }
             }
 
@@ -405,17 +405,17 @@ StyleClose =    '<' Spnl '/' ("style" | "STYLE") Spnl '>'
 InStyleTags =   StyleOpen (!StyleClose .)* StyleClose
 StyleBlock =    < InStyleTags >
                 BlankLine*
-                {   if (extension(EXT_FILTER_STYLES)) {
-                        $$ = mk_list(LIST, NULL);
+                {   if (extension(MDP_EXT_FILTER_STYLES)) {
+                        $$ = mk_list(MDP_LIST, NULL);
                     } else {
                         $$ = mk_str(yytext);
-                        $$->key = HTMLBLOCK;
+                        $$->key = MDP_HTMLBLOCK;
                     }
                 }
 
 Inlines  =  a:StartList ( !Endline Inline { a = cons($$, a); }
                         | c:Endline &Inline { a = cons(c, a); } )+ Endline?
-            { $$ = mk_list(LIST, a); }
+            { $$ = mk_list(MDP_LIST, a); }
 
 Inline  = Str
         | Endline
@@ -437,36 +437,36 @@ Inline  = Str
 
 Space = Spacechar+
         { $$ = mk_str(" ");
-          $$->key = SPACE; }
+          $$->key = MDP_SPACE; }
 
 Str = a:StartList < NormalChar+ > { a = cons(mk_str(yytext), a); }
       ( StrChunk { a = cons($$, a); } )*
-      { if (a->next == NULL) { $$ = a; } else { $$ = mk_list(LIST, a); } }
+      { if (a->next == NULL) { $$ = a; } else { $$ = mk_list(MDP_LIST, a); } }
 
 StrChunk = < (NormalChar | '_'+ &Alphanumeric)+ > { $$ = mk_str(yytext); } |
            AposChunk
 
-AposChunk = &{ extension(EXT_SMART) } '\'' &Alphanumeric
-      { $$ = mk_element(APOSTROPHE); }
+AposChunk = &{ extension(MDP_EXT_SMART) } '\'' &Alphanumeric
+      { $$ = mk_element(MDP_APOSTROPHE); }
 
 EscapedChar =   '\\' !Newline < [-\\`|*_{}[\]()#+.!><] >
                 { $$ = mk_str(yytext); }
 
 Entity =    ( HexEntity | DecEntity | CharEntity )
-            { $$ = mk_str(yytext); $$->key = HTML; }
+            { $$ = mk_str(yytext); $$->key = MDP_HTML; }
 
 Endline =   LineBreak | TerminalEndline | NormalEndline
 
 NormalEndline =   Sp Newline !BlankLine !'>' !AtxStart
                   !(Line ('='+ | '-'+) Newline)
                   { $$ = mk_str("\n");
-                    $$->key = SPACE; }
+                    $$->key = MDP_SPACE; }
 
 TerminalEndline = Sp Newline Eof
                   { $$ = NULL; }
 
 LineBreak = "  " NormalEndline
-            { $$ = mk_element(LINEBREAK); }
+            { $$ = mk_element(MDP_LINEBREAK); }
 
 Symbol =    < SpecialChar >
             { $$ = mk_str(yytext); }
@@ -487,7 +487,7 @@ EmphStar =  '*' !Whitespace
             | b:StrongStar  { a = cons(b, a); }
             )+
             '*'
-            { $$ = mk_list(EMPH, a); }
+            { $$ = mk_list(MDP_EMPH, a); }
 
 EmphUl =    '_' !Whitespace
             a:StartList
@@ -495,7 +495,7 @@ EmphUl =    '_' !Whitespace
             | b:StrongUl  { a = cons(b, a); }
             )+
             '_'
-            { $$ = mk_list(EMPH, a); }
+            { $$ = mk_list(MDP_EMPH, a); }
 
 Strong = StrongStar | StrongUl
 
@@ -503,26 +503,26 @@ StrongStar =    "**" !Whitespace
                 a:StartList
                 ( !"**" b:Inline { a = cons(b, a); })+
                 "**"
-                { $$ = mk_list(STRONG, a); }
+                { $$ = mk_list(MDP_STRONG, a); }
 
 StrongUl   =    "__" !Whitespace
                 a:StartList
                 ( !"__" b:Inline { a = cons(b, a); })+
                 "__"
-                { $$ = mk_list(STRONG, a); }
+                { $$ = mk_list(MDP_STRONG, a); }
 
-Strike = &{ extension(EXT_STRIKE) }
+Strike = &{ extension(MDP_EXT_STRIKE) }
          "~~" !Whitespace
          a:StartList
          ( !"~~" b:Inline { a = cons(b, a); })+
          "~~"
-         { $$ = mk_list(STRIKE, a); }
+         { $$ = mk_list(MDP_STRIKE, a); }
 
 Image = '!' ( ExplicitLink | ReferenceLink )
-        { if ($$->key == LINK) {
-              $$->key = IMAGE;
+        { if ($$->key == MDP_LINK) {
+              $$->key = MDP_IMAGE;
           } else {
-              element *result;
+              mdp_element *result;
               result = $$;
               $$->children = cons(mk_str("!"), result->children);
           } }
@@ -532,13 +532,13 @@ Link =  ExplicitLink | ReferenceLink | AutoLink
 ReferenceLink = ReferenceLinkDouble | ReferenceLinkSingle
 
 ReferenceLinkDouble =  a:Label < Spnl > !"[]" b:Label
-                       {   link match;
+                       {   mdp_link match;
                            if (find_reference(&match, b->children)) {
                                $$ = mk_link(a, match.url, match.title);
-                               free_element_tree(b);
+                               mdp_free_element_tree(b);
                            } else {
-                               element *result;
-                               result = mk_element(LIST);
+                               mdp_element *result;
+                               result = mk_element(MDP_LIST);
                                result->children = cons(mk_str("["), cons(a, cons(mk_str("]"), cons(mk_str(yytext),
                                                    cons(mk_str("["), cons(b, mk_str("]")))))));
                                $$ = result;
@@ -546,13 +546,13 @@ ReferenceLinkDouble =  a:Label < Spnl > !"[]" b:Label
                        }
 
 ReferenceLinkSingle =  a:Label < (Spnl "[]")? >
-                       {   link match;
+                       {   mdp_link match;
                            if (find_reference(&match, a->children)) {
                                $$ = mk_link(a, match.url, match.title);
                            }
                            else {
-                               element *result;
-                               result = mk_element(LIST);
+                               mdp_element *result;
+                               result = mk_element(MDP_LIST);
                                result->children = cons(mk_str("["), cons(a, cons(mk_str("]"), mk_str(yytext))));
                                $$ = result;
                            }
@@ -592,17 +592,17 @@ Reference = NonindentSpace !"[]" l:Label ':' Spnl s:RefSrc t:RefTitle BlankLine+
               free_element(s);
               free_element(t);
               free(l);
-              $$->key = REFERENCE; }
+              $$->key = MDP_REFERENCE; }
 
-Label = '[' ( !'^' &{ extension(EXT_NOTES) } | &. &{ !extension(EXT_NOTES) } )
+Label = '[' ( !'^' &{ extension(MDP_EXT_NOTES) } | &. &{ !extension(MDP_EXT_NOTES) } )
         a:StartList
         ( !']' Inline { a = cons($$, a); } )*
         ']'
-        { $$ = mk_list(LIST, a); }
+        { $$ = mk_list(MDP_LIST, a); }
 
 RefSrc = '<'? < UrlChar+ > '>'?
          { $$ = mk_str(yytext); 
-           $$->key = HTML; }
+           $$->key = MDP_HTML; }
 
 RefTitle =  ( RefTitleSingle | RefTitleDouble | RefTitleParens | EmptyTitle )
             { $$ = mk_str(yytext); }
@@ -631,14 +631,14 @@ Code = ( Ticks1 Sp < ( ( !'`' Nonspacechar )+ | !Ticks1 '`'+ | !( Sp Ticks1 ) ( 
        | Ticks4 Sp < ( ( !'`' Nonspacechar )+ | !Ticks4 '`'+ | !( Sp Ticks4 ) ( Spacechar | Newline !BlankLine ) )+ > Sp Ticks4
        | Ticks5 Sp < ( ( !'`' Nonspacechar )+ | !Ticks5 '`'+ | !( Sp Ticks5 ) ( Spacechar | Newline !BlankLine ) )+ > Sp Ticks5
        )
-       { $$ = mk_str(yytext); $$->key = CODE; }
+       { $$ = mk_str(yytext); $$->key = MDP_CODE; }
 
 RawHtml =   < (HtmlComment | HtmlBlockScript | HtmlTag) >
-            {   if (extension(EXT_FILTER_HTML)) {
-                    $$ = mk_list(LIST, NULL);
+            {   if (extension(MDP_EXT_FILTER_HTML)) {
+                    $$ = mk_list(MDP_LIST, NULL);
                 } else {
                     $$ = mk_str(yytext);
-                    $$->key = HTML;
+                    $$->key = MDP_HTML;
                 }
             }
 
@@ -687,25 +687,25 @@ SkipBlock = HtmlBlock
 
 # Syntax extensions
 
-ExtendedSpecialChar = &{ extension(EXT_SMART) } ('.' | '-' | '\'' | '"')
-                    | &{ extension(EXT_NOTES) } ( '^' )
+ExtendedSpecialChar = &{ extension(MDP_EXT_SMART) } ('.' | '-' | '\'' | '"')
+                    | &{ extension(MDP_EXT_NOTES) } ( '^' )
 
-Smart = &{ extension(EXT_SMART) }
+Smart = &{ extension(MDP_EXT_SMART) }
         ( Ellipsis | Dash | SingleQuoted | DoubleQuoted | Apostrophe )
 
 Apostrophe = '\''
-             { $$ = mk_element(APOSTROPHE); }
+             { $$ = mk_element(MDP_APOSTROPHE); }
 
 Ellipsis = ("..." | ". . .")
-           { $$ = mk_element(ELLIPSIS); }
+           { $$ = mk_element(MDP_ELLIPSIS); }
 
 Dash = EmDash | EnDash
 
 EnDash = '-' &Digit
-         { $$ = mk_element(ENDASH); }
+         { $$ = mk_element(MDP_ENDASH); }
 
 EmDash = ("---" | "--")
-         { $$ = mk_element(EMDASH); }
+         { $$ = mk_element(MDP_EMDASH); }
 
 SingleQuoteStart = '\'' !(Spacechar | Newline)
 
@@ -715,7 +715,7 @@ SingleQuoted = SingleQuoteStart
                a:StartList
                ( !SingleQuoteEnd b:Inline { a = cons(b, a); } )+
                SingleQuoteEnd
-               { $$ = mk_list(SINGLEQUOTED, a); }
+               { $$ = mk_list(MDP_SINGLEQUOTED, a); }
 
 DoubleQuoteStart = '"'
 
@@ -725,13 +725,13 @@ DoubleQuoted =  DoubleQuoteStart
                 a:StartList
                 ( !DoubleQuoteEnd b:Inline { a = cons(b, a); } )+
                 DoubleQuoteEnd
-                { $$ = mk_list(DOUBLEQUOTED, a); }
+                { $$ = mk_list(MDP_DOUBLEQUOTED, a); }
 
-NoteReference = &{ extension(EXT_NOTES) }
+NoteReference = &{ extension(MDP_EXT_NOTES) }
                 ref:RawNoteReference
-                {   element *match;
+                {   mdp_element *match;
                     if (find_note(&match, ref->contents.str)) {
-                        $$ = mk_element(NOTE);
+                        $$ = mk_element(MDP_NOTE);
                         assert(match->children != NULL);
                         $$->children = match->children;
                         $$->contents.str = 0;
@@ -747,21 +747,21 @@ NoteReference = &{ extension(EXT_NOTES) }
 RawNoteReference = "[^" < ( !Newline !']' . )+ > ']'
                    { $$ = mk_str(yytext); }
 
-Note =          &{ extension(EXT_NOTES) }
+Note =          &{ extension(MDP_EXT_NOTES) }
                 NonindentSpace ref:RawNoteReference ':' Sp
                 a:StartList
                 ( RawNoteBlock { a = cons($$, a); } )
                 ( &Indent RawNoteBlock { a = cons($$, a); } )*
-                {   $$ = mk_list(NOTE, a);
+                {   $$ = mk_list(MDP_NOTE, a);
                     $$->contents.str = strdup(ref->contents.str);
                 }
 
-InlineNote =    &{ extension(EXT_NOTES) }
+InlineNote =    &{ extension(MDP_EXT_NOTES) }
                 "^["
                 a:StartList
                 ( !']' Inline { a = cons($$, a); } )+
                 ']'
-                { $$ = mk_list(NOTE, a);
+                { $$ = mk_list(MDP_NOTE, a);
                   $$->contents.str = 0; }
 
 Notes =         a:StartList
@@ -772,7 +772,7 @@ RawNoteBlock =  a:StartList
                     ( !BlankLine OptionallyIndentedLine { a = cons($$, a); } )+
                 ( < BlankLine* > { a = cons(mk_str(yytext), a); } )
                 {   $$ = mk_str_from_list(a, true);
-                    $$->key = RAW;
+                    $$->key = MDP_RAW;
                 }
 
 %%

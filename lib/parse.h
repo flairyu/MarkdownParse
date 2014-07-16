@@ -5,11 +5,11 @@
 
 #include "markdownparse.h"
 
-element *parse_references(char *string, int extensions);
-element *parse_notes(char *string, int extensions, element *reference_list);
-element *parse_content(char *string, int extensions, element *reference_list, element *note_list);
+mdp_element *parse_references(char *string, int extensions);
+mdp_element *parse_notes(char *string, int extensions, mdp_element *reference_list);
+mdp_element *parse_content(char *string, int extensions, mdp_element *reference_list, mdp_element *note_list);
 
-void free_element(element *elt);
-void free_element_contents(element elt);
+void free_element(mdp_element *elt);
+void free_element_contents(mdp_element elt);
 
 #endif
