@@ -1,5 +1,5 @@
 add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/markdown_parser.c
-                   COMMAND leg ${CMAKE_CURRENT_SOURCE_DIR}/markdown_parser.leg -o ${CMAKE_CURRENT_BINARY_DIR}/markdown_parser.c
+                   COMMAND leg -o ${CMAKE_CURRENT_BINARY_DIR}/markdown_parser.c ${CMAKE_CURRENT_SOURCE_DIR}/markdown_parser.leg
                    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/markdown_parser.leg
                    VERBATIM)
 add_library(markdownparse

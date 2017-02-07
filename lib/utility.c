@@ -20,7 +20,7 @@ char *strdup(char const *s) {
 	return d;
 }
 
-static bool strcasecmp(char const *s1, char const *s2) {
+static bool strCaseCmp(char const *s1, char const *s2) {
 	while (tolower(*s1) == tolower(*s2) &&
 	       *s1 != '\0' && *s2 != '\0') {
 		s1++;
@@ -172,7 +172,7 @@ bool match_inlines(mdp_element *l1, mdp_element *l2) {
 			case MDP_CODE:
 			case MDP_STR:
 			case MDP_HTML:
-				if (strcasecmp(l1->contents.str, l2->contents.str) != 0)
+				if (strCaseCmp(l1->contents.str, l2->contents.str) != 0)
 					return false;
 				break;
 			case MDP_EMPH:
